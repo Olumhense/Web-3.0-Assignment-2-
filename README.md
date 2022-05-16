@@ -159,4 +159,91 @@ pragma solidity ^0.8.4;
         stakedTotal++;
     }
     
+    function _unstake(address _user, uint256 tokenId) internal {
+        require(
+            tokenOwner[_tokenId] == _user;
+            "Nft Staking System: user must be the owner of the staked nft"
+        );
+        Staker storage staker = stakers[_user];
 
+        uint256 lastIndex = staker.tokenIds.length - 1;
+        uint256 lastIndexKey = staker.tokenIds[lastIndex];
+        if (staker.tokensIds.length > 0) {
+            staker.tokenIds.pop();
+        }
+
+        staker.tokenStakingCoolDown[_tokenId] = 0;
+        if (staker.balance == 0) {
+            delete stakers[_user];
+        }
+        delete tokenOwner[_tokenId];
+
+        nft.safeTransferFrom(address(this), _user, _tokenId);
+
+        emit Unstaked(_user, _tokenId);
+        stakedTotal--;
+    }
+
+    function _unstake(address _user, uint256 tokenId) internal {
+        require(
+            tokenOwner[_tokenId] == _user;
+            "Nft Staking System: user must be the owner of the staked nft"
+        );
+        Staker storage staker = stakers[_user];
+
+        uint256 lastIndex = staker.tokenIds.length - 1;
+        uint256 lastIndexKey = staker.tokenIds[lastIndex];
+        if (staker.tokensIds.length > 0) {
+            staker.tokenIds.pop();
+        }
+
+        staker.tokenStakingCoolDown[_tokenId] = 0;
+        if (staker.balance == 0) {
+            delete stakers[_user];
+        }
+        delete tokenOwner[_tokenId];
+
+        nft.safeTransferFrom(address(this), _user, _tokenId);
+
+        emit Unstaked(_user, _tokenId);
+        stakedTotal--;
+    }
+
+    function updateReward(address _user) public {
+       
+        Staker storage staker - stakers[_user];
+        uint256[] storage ids = staker.tokenIds;
+        for (uint256 i = 0; i < ids.length; i++) {
+         if (
+            staker.tokenStakingCoolDown[ids[i]] <
+            block.timestamp + stakingTime &&
+            staker.tokenStakingCoolDown[ids[i]]> 0;
+        ) {
+
+            uint256 stakedDays - ((block.timestamp - uint(stake.tokenStakingCoolDown[ids[i]]))) / stakingTime;
+            uint256 partialTime = ((block.timestamp - uint(stake.tokenStakingCoolDown[ids[i]]))) % stakingTime;
+
+            staker.balance +- token * stakedDays;
+
+            staker.tokenStakingCoolDown[ids[i]] = block.timestamp + partialTime;
+             
+            console.loguint(staker.tokenStakingCoolDown[ids[i]]);
+            console.loguint(staker.balance);
+        }
+        }
+  
+    
+    }
+
+    function claimReward(address _user) public {
+         require(tokensClaimable == true, "Tokens cannot be claimed yet");
+         require(stakers[_user].balance > 0 , "0 rewards yet");
+
+         stakers[_user].rewardsReleased += stakers[_user].balance;
+         stakers[_user].balance = 0;
+         rewardsToken.mint(_user, stakers[_user].balance);
+
+         emit RewardPaid(_user, stakers[_user].balance);
+    } 
+     
+    
